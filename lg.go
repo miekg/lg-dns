@@ -9,9 +9,12 @@ import (
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
 	"log"
+	"log/syslog"
 	"net/http"
 	"strings"
 )
+
+var lg *log.Logger
 
 func void(w http.ResponseWriter, r *http.Request) {}
 
@@ -21,7 +24,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		dnstype uint16
 		ok      bool
 	)
-	log.Printf("request from %s %s\n", r.RemoteAddr, r.URL)
+	lg.Printf("request from %s %s\n", r.RemoteAddr, r.URL)
 	if dnstype, ok = dns.StringToType[typ]; !ok {
 		fmt.Fprintf(w, "Record type "+typ+" does not exist")
 		return
@@ -82,6 +85,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 }
 
 func main() {
+	var err error
 	router := mux.NewRouter()
 	router.HandleFunc("/{domain}", func(w http.ResponseWriter, r *http.Request) {
 		handler(w, r, "A")
@@ -92,8 +96,13 @@ func main() {
 	http.HandleFunc("/favicon.ico", void)
 	http.Handle("/", router)
 
-	e := http.ListenAndServe(":8080", nil)
-	if e != nil {
-		log.Fatal("ListenAndServe: ", e)
+	lg, err = syslog.NewLogger(syslog.LOG_INFO, log.LstdFlags)
+	if err != nil {
+		log.Fatal("NewLogger: ", err)
+	}
+
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
