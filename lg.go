@@ -40,6 +40,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 	u := unbound.New()
 	defer u.Destroy()
 	fwd := false
+	format := "html"
 	u.SetOption("edns-buffer-size:", "4096")
 	for k, v := range values {
 		switch k {
@@ -72,6 +73,12 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 					return
 				}
 			}
+		case "format": // unsupported format defaut to html
+			for _, f := range []string{"html", "zone", "xml", "json", "text"} {
+				if v[0] == f {
+					format = f
+				}
+			}
 		}
 	}
 	if !fwd {
@@ -86,12 +93,18 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		fmt.Fprintf(w, "Domain %s does not exist", domain)
 		return
 	}
-	fmt.Fprintf(w, "%s\n", d.AnswerPacket)
+	switch format {
+	case "html":
+		Html(w, d)
+	case "json":
+		Json(w, d)
+
+	}
 }
 
 func main() {
 	port := flag.Int("port", 80, "port number to use")
-	mail := flag.String("mail", "", "email of service maintainer")
+	mail := flag.String("mail", "nobody@example.com", "email of service maintainer")
 	loc := flag.String("loc", "COUNTRY, hosted a HOSTER, AS NNNN", "location of the server")
 	res := flag.String("res", "Unbound with DNSSEC validation", "resolver used")
 	flag.Parse()
