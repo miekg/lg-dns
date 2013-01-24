@@ -31,7 +31,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 
 	u := unbound.New()
 	defer u.Destroy()
-	u.ResolvConf("/etc/resolv.conf")
+	fwd := false
 	u.SetOption("edns-buffer-size:", "4096")
 	for k, v := range values {
 		switch k {
@@ -49,10 +49,11 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 				return
 			}
 		case "server":
-			if err := u.SetOption("forward-addr:", v[0]); err != nil {
-				fmt.Fprintf(w, "Not a valid server: %s", v[0])
+			if err := u.SetFwd(v[0]); err != nil {
+				fmt.Fprintf(w, "Not a valid server `%s': %s", v[0], err.Error())
 				return
 			}
+			fwd = true
 		case "reverse":
 			if v[0] == "1" {
 				var err error
@@ -64,6 +65,9 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 				}
 			}
 		}
+	}
+	if !fwd {
+		u.ResolvConf("/etc/resolv.conf")
 	}
 	d, err := u.Resolve(domain, dnstype, dns.ClassINET)
 	if err != nil {
