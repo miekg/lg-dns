@@ -27,6 +27,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		return
 	}
 	values := r.URL.Query()
+	domain := mux.Vars(r)["domain"]
 
 	u := unbound.New()
 	defer u.Destroy()
@@ -52,17 +53,28 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 				fmt.Fprintf(w, "Not a valid server: %s", v[0])
 				return
 			}
+		case "reverse":
+			if v[0] == "1" {
+				var err error
+				dnstype = dns.TypePTR
+				domain, err = dns.ReverseAddr(domain)
+				if err != nil {
+					fmt.Fprintf(w, "Not a valid IP address: %s", v[0])
+					return
+				}
+			}
 		}
 	}
-	d, err := u.Resolve(mux.Vars(r)["domain"], dnstype, dns.ClassINET)
+	d, err := u.Resolve(domain, dnstype, dns.ClassINET)
 	if err != nil {
 		fmt.Fprintf(w, "error")
 		return
 	}
 	if !d.HaveData {
-		fmt.Fprintf(w, "Domain %s does not exist", mux.Vars(r)["domain"])
+		fmt.Fprintf(w, "Domain %s does not exist", domain)
 		return
 	}
+	fmt.Fprintf(w, "%s\n", d.AnswerPacket)
 }
 
 func main() {
