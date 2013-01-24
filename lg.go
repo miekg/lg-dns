@@ -4,6 +4,7 @@ package main
 // http://www.bortzmeyer.org/dns-lg.html
 
 import (
+	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/miekg/dns"
@@ -11,10 +12,14 @@ import (
 	"log"
 	"log/syslog"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
-var lg *log.Logger
+var (
+	lg   *log.Logger
+	info string
+)
 
 func void(w http.ResponseWriter, r *http.Request) {}
 
@@ -85,6 +90,15 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 }
 
 func main() {
+	port := flag.Int("port", 80, "port number to use")
+	mail := flag.String("mail", "", "email of service maintainer")
+	loc := flag.String("loc", "COUNTRY, hosted a HOSTER, AS NNNN", "location of the server")
+	res := flag.String("res", "Unbound with DNSSEC validation", "resolver used")
+	flag.Parse()
+
+	info = "Service managed by " + *mail + " / Local resolver is " + *res +
+		", the machine is in " + *loc + " / DNS Looking Glass Go version"
+
 	var err error
 	router := mux.NewRouter()
 	router.HandleFunc("/{domain}", func(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +115,7 @@ func main() {
 		log.Fatal("NewLogger: ", err)
 	}
 
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":"+strconv.Itoa(*port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
