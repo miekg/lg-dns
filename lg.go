@@ -18,7 +18,11 @@ import (
 
 var (
 	lg   *log.Logger
+	mail *string
+	loc  *string
+	res  *string
 	info string
+	ver  string
 )
 
 func void(w http.ResponseWriter, r *http.Request) {}
@@ -104,13 +108,14 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 
 func main() {
 	port := flag.Int("port", 80, "port number to use")
-	mail := flag.String("mail", "nobody@example.com", "email of service maintainer")
-	loc := flag.String("loc", "COUNTRY, hosted a HOSTER, AS NNNN", "location of the server")
-	res := flag.String("res", "Unbound with DNSSEC validation", "resolver used")
+	mail = flag.String("mail", "nobody@example.com", "email of service maintainer")
+	loc = flag.String("loc", "COUNTRY, hosted at HOSTER, AS NNNN", "location of the server")
+	ver = "DNS Looking Glass Go version"
+	res = flag.String("res", "Unbound with DNSSEC validation", "resolver used")
 	flag.Parse()
 
 	info = "Service managed by " + *mail + " / Local resolver is " + *res +
-		", the machine is in " + *loc + " / DNS Looking Glass Go version"
+		", the machine is in " + *loc + " / " + ver
 
 	var err error
 	router := mux.NewRouter()
