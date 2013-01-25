@@ -38,15 +38,14 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		fmt.Fprintf(w, "Record type "+typ+" does not exist")
 		return
 	}
-	values := r.URL.Query()
 	domain := mux.Vars(r)["domain"]
 
 	u := unbound.New()
 	defer u.Destroy()
-	fwd := false
+	forward := false
 	format := "html"
-	u.SetOption("edns-buffer-size:", "4096")
-	for k, v := range values {
+	u.SetOption("module-config:", "iterator")
+	for k, v := range r.URL.Query() {
 		switch k {
 		case "tcp":
 			if v[0] == "1" {
@@ -54,6 +53,8 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 			}
 		case "dodnssec":
 			if v[0] == "1" {
+				u.SetOption("module-config:", "validator iterator")
+				u.SetOption("edns-buffer-size:", "4096")
 				u.AddTaFile("Kroot.key")
 			}
 		case "buffersize":
@@ -66,7 +67,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 				fmt.Fprintf(w, "Not a valid server `%s': %s", v[0], err.Error())
 				return
 			}
-			fwd = true
+			forward = true
 		case "reverse":
 			if v[0] == "1" {
 				var err error
@@ -85,7 +86,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 			}
 		}
 	}
-	if !fwd {
+	if !forward {
 		u.ResolvConf("/etc/resolv.conf")
 	}
 	d, err := u.Resolve(domain, dnstype, dns.ClassINET)
@@ -102,7 +103,6 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		Html(w, d)
 	case "json":
 		Json(w, d)
-
 	}
 }
 

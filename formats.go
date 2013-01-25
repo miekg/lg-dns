@@ -23,16 +23,16 @@ type QuestionSection struct {
 }
 
 type Answer struct {
-	Query *Query
-	AnswerSection []dns.RR
-	ReturnCode string
+	Query           *Query
+	AnswerSection   []dns.RR
+	ReturnCode      string
 	QuestionSection *QuestionSection
 }
 
 func unboundToAnswer(u *unbound.Result) *Answer {
 	a := new(Answer)
 	a.Query = &Query{u.Rtt, ver, *loc, ""}
-	a.AnswerSection = u.Rr
+	a.AnswerSection = u.AnswerPacket.Answer
 	a.ReturnCode = dns.RcodeToString[u.Rcode]
 	a.QuestionSection = &QuestionSection{dns.TypeToString[u.Qtype], u.Qname}
 	return a
@@ -43,7 +43,7 @@ func Html(w http.ResponseWriter, u *unbound.Result) {
 }
 
 func Json(w http.ResponseWriter, u *unbound.Result) {
-	b, err := json.Marshal( unboundToAnswer(u))
+	b, err := json.Marshal(unboundToAnswer(u))
 	if err != nil { // must always work?
 		fmt.Fprintf(w, "%s", err.Error())
 		return
