@@ -3,6 +3,8 @@ package main
 // DNS Looking glass
 // http://www.bortzmeyer.org/dns-lg.html
 
+// TODO: Fix the output to be more inline with the other ones
+
 import (
 	"flag"
 	"fmt"
@@ -103,6 +105,8 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		Html(w, d)
 	case "json":
 		Json(w, d)
+	case "text":
+		Text(w, d)
 	}
 }
 

@@ -29,6 +29,23 @@ type Answer struct {
 	QuestionSection *QuestionSection
 }
 
+/*
+Query for: www.miek.nl., type SOA
+Flags: 
+Canonical name: a.miek.nl.
+TTL: 39624
+Resolver queried: ::1
+Query done at: 2013-01-25 09:31:22Z
+Query duration: 0:00:00.001288
+Service description: / Local resolver is Unbound with DNSSEC validation, the machine is in the USA, hosted at 6sync, AS 46636.
+DNS Looking Glass 2013012101, DNSpython version 1.10.0, Python version CPython 2.7.3 on Linux
+*/
+func (a *Answer) String() string {
+	s := "Query for: " + a.QuestionSection.Qname + ", type " + a.QuestionSection.Qtype + "\n"
+	s += "Flags:"
+	return s
+}
+
 func unboundToAnswer(u *unbound.Result) *Answer {
 	a := new(Answer)
 	a.Query = &Query{u.Rtt, ver, *loc, ""}
