@@ -31,7 +31,6 @@ func Text(w http.ResponseWriter, u *unbound.Result) {
 }
 
 func Xml(w http.ResponseWriter, u *unbound.Result) {
-	for _, r := range u.Rr {
-		fmt.Fprintf(w, "%s\n", r.String())
-	}
+	s, _ := unboundToXML(u)
+	fmt.Fprintf(w, "%s\n", s)
 }

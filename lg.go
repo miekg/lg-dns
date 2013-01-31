@@ -107,6 +107,8 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		Json(w, d)
 	case "text":
 		Text(w, d)
+	case "xml":
+		Xml(w, d)
 	}
 }
 
@@ -139,6 +141,6 @@ func main() {
 
 	err = http.ListenAndServe(":"+strconv.Itoa(*port), nil)
 	if err != nil {
-		lg.Fatal("ListenAndServe: ", err)
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
