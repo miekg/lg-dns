@@ -11,17 +11,17 @@ import (
 // DNS message in XML
 
 type Response struct {
-	Id          uint16           `xml:"id,json:"id"`
-	Aa          int              `xml:"aa"`
-	Ad          int              `xml:"ad"`
-	Cd          int              `xml:"cd"`
-	Rcode       string           `xml:"rcode"`
-	Anscount    int              `xml:"anscount"`
-	Answers     []ResourceRecord `xml:"answers>answer,json:"answers>answer"`
-	Nscount     int              `xml:"nscount"`
-	Authorities []ResourceRecord `xml:"authorities>authority,json:authorities>authority"`
-	Arcount     int              `xml:"arcount"`
-	Additionals []ResourceRecord `xml:"additionals>additional,json:additionals>additional"`
+	Id          uint16           `xml:"id" json:"id"`
+	Aa          int              `xml:"aa" json:"aa"`
+	Ad          int              `xml:"ad" json:"ad"`
+	Cd          int              `xml:"cd" json:"cd"`
+	Rcode       string           `xml:"rcode" json:"rcode"`
+	Anscount    int              `xml:"anscount" json:"anscount"`
+	Answers     []ResourceRecord `xml:"answers>answer" json:"answers"`
+	Nscount     int              `xml:"nscount" json:"nscount"`
+	Authorities []ResourceRecord `xml:"authorities>authority" json:"authorities"`
+	Arcount     int              `xml:"arcount" json:"arcount"`
+	Additionals []ResourceRecord `xml:"additionals>additional" json:"additionals"`
 }
 
 type ResourceRecord struct {
