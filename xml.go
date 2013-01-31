@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/xml"
+	"encoding/json"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
 )
@@ -10,17 +11,17 @@ import (
 // DNS message in XML
 
 type Response struct {
-	Id          uint16           `xml:"id"`
+	Id          uint16           `xml:"id,json:"id"`
 	Aa          int              `xml:"aa"`
 	Ad          int              `xml:"ad"`
 	Cd          int              `xml:"cd"`
 	Rcode       string           `xml:"rcode"`
 	Anscount    int              `xml:"anscount"`
-	Answers     []ResourceRecord `xml:"answers>answer"`
+	Answers     []ResourceRecord `xml:"answers>answer,json:"answers>answer"`
 	Nscount     int              `xml:"nscount"`
-	Authorities []ResourceRecord `xml:"authorities>authority"`
+	Authorities []ResourceRecord `xml:"authorities>authority,json:authorities>authority"`
 	Arcount     int              `xml:"arcount"`
-	Additionals []ResourceRecord `xml:"additionals>additional"`
+	Additionals []ResourceRecord `xml:"additionals>additional,json:additionals>additional"`
 }
 
 type ResourceRecord struct {
@@ -40,6 +41,22 @@ func boolToInt(b bool) int {
 }
 
 func unboundToXML(u *unbound.Result) (string, error) {
+	output, err := xml.MarshalIndent(toResponse(u), "  ", "    ")
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func unboundToJson(u *unbound.Result) (string, error) {
+	output, err := json.MarshalIndent(toResponse(u), "  ", "    ")
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func toResponse(u *unbound.Result) *Response {
 	r := &Response{Id: u.AnswerPacket.Id,
 		Aa:       boolToInt(u.AnswerPacket.Authoritative),
 		Ad:       boolToInt(u.AnswerPacket.AuthenticatedData),
@@ -52,11 +69,7 @@ func unboundToXML(u *unbound.Result) (string, error) {
 	r.Answers = sectionToResourceRecords(u.AnswerPacket.Answer)
 	r.Authorities = sectionToResourceRecords(u.AnswerPacket.Ns)
 	r.Additionals = sectionToResourceRecords(u.AnswerPacket.Extra)
-	output, err := xml.MarshalIndent(r, "  ", "    ")
-	if err != nil {
-		return "", err
-	}
-	return string(output), nil
+	return r
 }
 
 func sectionToResourceRecords(section []dns.RR) []ResourceRecord {

@@ -13,9 +13,8 @@ func Html(w http.ResponseWriter, u *unbound.Result) {
 }
 
 func Json(w http.ResponseWriter, u *unbound.Result) {
-	for _, r := range u.Rr {
-		fmt.Fprintf(w, "%s\n", r.String())
-	}
+	s, _ := unboundToJson(u)
+	fmt.Fprintf(w, "%s\n", s)
 }
 
 func Zone(w http.ResponseWriter, u *unbound.Result) {
