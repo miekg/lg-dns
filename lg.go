@@ -97,7 +97,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		return
 	}
 	if !d.HaveData {
-		fmt.Fprintf(w, "Domain %s does not exist", domain)
+		fmt.Fprintf(w, "Domain %s (type %s) does not exist", domain, dns.TypeToString[dnstype])
 		return
 	}
 	switch format {

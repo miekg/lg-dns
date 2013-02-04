@@ -25,7 +25,7 @@ type Response struct {
 	Ad       int              `xml:"ad" json:"ad"`
 	Cd       int              `xml:"cd" json:"cd"`
 	Rcode    string           `xml:"rcode" json:"rcode"`
-	Anscount int              `xml:"anscount json:"anscount"`
+	Anscount int              `xml:"anscount" json:"anscount"`
 	Answers  []ResourceRecord `xml:"answers>answer" json:"answers"`
 	//	Nscount     int              `xml:"nscount" json:"nscount"`
 	//	Authorities []ResourceRecord `xml:"authorities>authority" json:"authorities"`
