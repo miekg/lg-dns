@@ -1,27 +1,42 @@
 package main
 
 import (
-	"encoding/xml"
 	"encoding/json"
+	"encoding/xml"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
+	"time"
 )
 
 // http://tools.ietf.org/html/draft-mohan-dns-query-xml-00
 // DNS message in XML
 
+type Query struct {
+	When        time.Time
+	Duration    time.Duration
+	Version     string
+	Description string
+	Server      string
+}
+
 type Response struct {
-	Id          uint16           `xml:"id" json:"id"`
-	Aa          int              `xml:"aa" json:"aa"`
-	Ad          int              `xml:"ad" json:"ad"`
-	Cd          int              `xml:"cd" json:"cd"`
-	Rcode       string           `xml:"rcode" json:"rcode"`
-	Anscount    int              `xml:"anscount" json:"anscount"`
-	Answers     []ResourceRecord `xml:"answers>answer" json:"answers"`
-	Nscount     int              `xml:"nscount" json:"nscount"`
-	Authorities []ResourceRecord `xml:"authorities>authority" json:"authorities"`
-	Arcount     int              `xml:"arcount" json:"arcount"`
-	Additionals []ResourceRecord `xml:"additionals>additional" json:"additionals"`
+	Id       uint16           `xml:"-" json:"-"`
+	Aa       int              `xml:"aa" json:"aa"`
+	Ad       int              `xml:"ad" json:"ad"`
+	Cd       int              `xml:"cd" json:"cd"`
+	Rcode    string           `xml:"rcode" json:"rcode"`
+	Anscount int              `xml:"anscount json:"anscount"`
+	Answers  []ResourceRecord `xml:"answers>answer" json:"answers"`
+	//	Nscount     int              `xml:"nscount" json:"nscount"`
+	//	Authorities []ResourceRecord `xml:"authorities>authority" json:"authorities"`
+	//	Arcount     int              `xml:"arcount" json:"arcount"`
+	//	Additionals []ResourceRecord `xml:"additionals>additional" json:"additionals"`
+}
+
+type LookingGlass struct {
+	XMLName  xml.Name `xml:"Result" json:"-"`
+	Query    Query    `xml:"Query" json:"Query"`
+	Response Response `xml:"Response" json:"Response"`
 }
 
 type ResourceRecord struct {
@@ -40,8 +55,19 @@ func boolToInt(b bool) int {
 	return 0
 }
 
+func boolToString(b bool) string {
+	if b {
+		return "1"
+	}
+	return "0"
+}
+
+func unboundToHTML(u *unbound.Result) (string, error) {
+	return "", nil
+}
+
 func unboundToXML(u *unbound.Result) (string, error) {
-	output, err := xml.MarshalIndent(toResponse(u), "  ", "    ")
+	output, err := xml.MarshalIndent(toLookingGlass(u), "  ", "    ")
 	if err != nil {
 		return "", err
 	}
@@ -49,27 +75,41 @@ func unboundToXML(u *unbound.Result) (string, error) {
 }
 
 func unboundToJson(u *unbound.Result) (string, error) {
-	output, err := json.MarshalIndent(toResponse(u), "  ", "    ")
+	output, err := json.MarshalIndent(toLookingGlass(u), "  ", "    ")
 	if err != nil {
 		return "", err
 	}
 	return string(output), nil
 }
 
-func toResponse(u *unbound.Result) *Response {
-	r := &Response{Id: u.AnswerPacket.Id,
-		Aa:       boolToInt(u.AnswerPacket.Authoritative),
-		Ad:       boolToInt(u.AnswerPacket.AuthenticatedData),
-		Cd:       boolToInt(u.AnswerPacket.CheckingDisabled),
-		Rcode:    dns.RcodeToString[u.AnswerPacket.Rcode],
-		Anscount: len(u.AnswerPacket.Answer),
-		Nscount:  len(u.AnswerPacket.Ns),
-		Arcount:  len(u.AnswerPacket.Extra)}
+func unboundToZone(u *unbound.Result) (string, error) {
+	lg := toLookingGlass(u)
+	output := "; When: " + lg.Query.When.String() + "\n"
+	output += "; Query: " + lg.Query.Duration.String() + "\n"
+	output += "; Version: " + lg.Query.Version + "\n"
+	output += "; Description: " + lg.Query.Description + "\n"
+	output += "; Server: " + lg.Query.Server + "\n"
+	output += "; Flags: Aa:" + boolToString(u.AnswerPacket.Authoritative)
+	output += ",Ad:" + boolToString(u.AnswerPacket.AuthenticatedData)
+	output += ",Cd:" + boolToString(u.AnswerPacket.CheckingDisabled)
+	output += ", Rcode: " + dns.RcodeToString[u.AnswerPacket.Rcode] + "\n"
+	output += "\n; Answer Section:\n"
+	for _, r := range u.AnswerPacket.Answer {
+		output += r.String() + "\n"
+	}
+	return output, nil
+}
 
-	r.Answers = sectionToResourceRecords(u.AnswerPacket.Answer)
-	r.Authorities = sectionToResourceRecords(u.AnswerPacket.Ns)
-	r.Additionals = sectionToResourceRecords(u.AnswerPacket.Extra)
-	return r
+func toLookingGlass(u *unbound.Result) *LookingGlass {
+	l := &LookingGlass{Query: Query{time.Now(), u.Rtt, ver, "Managed by " + *mail + ", " + *loc, *res},
+		Response: Response{Id: u.AnswerPacket.Id,
+			Aa:       boolToInt(u.AnswerPacket.Authoritative),
+			Ad:       boolToInt(u.AnswerPacket.AuthenticatedData),
+			Cd:       boolToInt(u.AnswerPacket.CheckingDisabled),
+			Rcode:    dns.RcodeToString[u.AnswerPacket.Rcode],
+			Anscount: len(u.AnswerPacket.Answer)}}
+	l.Response.Answers = sectionToResourceRecords(u.AnswerPacket.Answer)
+	return l
 }
 
 func sectionToResourceRecords(section []dns.RR) []ResourceRecord {
