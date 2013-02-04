@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
-	"html/template"
 	"time"
 )
 
@@ -62,26 +60,6 @@ func boolToString(b bool) string {
 		return "1"
 	}
 	return "0"
-}
-
-func unboundToHTML(u *unbound.Result) (string, error) {
-	tmpl, err := template.New("lg").Parse(`<html><head></head><body>
-	When: {{.Query.When}}<br/>
-	Query Duration: {{.Query.Duration}}<br/>
-	<hr/>
-	</body>
-	</html>
-	`)
-
-	if err != nil {
-		return "", err
-	}
-	b := new(bytes.Buffer)
-	err = tmpl.Execute(b, toLookingGlass(u))
-	if err != nil {
-		return "", err
-	}
-	return b.String(), nil
 }
 
 func unboundToXML(u *unbound.Result) (string, error) {

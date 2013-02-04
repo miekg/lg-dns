@@ -101,12 +101,11 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		return
 	}
 	switch format {
-	case "html":
-		Html(w, d)
 	case "json":
 		Json(w, d)
 	case "xml":
 		Xml(w, d)
+	case "html": fallthrough
 	case "text": fallthrough
 	case "zone":
 		Zone(w, d)

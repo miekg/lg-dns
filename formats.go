@@ -6,11 +6,6 @@ import (
 	"net/http"
 )
 
-func Html(w http.ResponseWriter, u *unbound.Result) {
-	s, _ := unboundToHTML(u)
-	fmt.Fprintf(w, "%s\n", s)
-}
-
 func Xml(w http.ResponseWriter, u *unbound.Result) {
 	s, _ := unboundToXML(u)
 	fmt.Fprintf(w, "%s\n", s)
