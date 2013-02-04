@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
+	"html/template"
 	"time"
 )
 
@@ -63,7 +65,23 @@ func boolToString(b bool) string {
 }
 
 func unboundToHTML(u *unbound.Result) (string, error) {
-	return "", nil
+	tmpl, err := template.New("lg").Parse(`<html><head></head><body>
+	When: {{.Query.When}}<br/>
+	Query Duration: {{.Query.Duration}}<br/>
+	<hr/>
+	</body>
+	</html>
+	`)
+
+	if err != nil {
+		return "", err
+	}
+	b := new(bytes.Buffer)
+	err = tmpl.Execute(b, toLookingGlass(u))
+	if err != nil {
+		return "", err
+	}
+	return b.String(), nil
 }
 
 func unboundToXML(u *unbound.Result) (string, error) {
@@ -85,7 +103,7 @@ func unboundToJson(u *unbound.Result) (string, error) {
 func unboundToZone(u *unbound.Result) (string, error) {
 	lg := toLookingGlass(u)
 	output := "; When: " + lg.Query.When.String() + "\n"
-	output += "; Query: " + lg.Query.Duration.String() + "\n"
+	output += "; Query duration: " + lg.Query.Duration.String() + "\n"
 	output += "; Version: " + lg.Query.Version + "\n"
 	output += "; Description: " + lg.Query.Description + "\n"
 	output += "; Server: " + lg.Query.Server + "\n"

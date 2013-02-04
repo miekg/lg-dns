@@ -7,9 +7,8 @@ import (
 )
 
 func Html(w http.ResponseWriter, u *unbound.Result) {
-	for _, r := range u.Rr {
-		fmt.Fprintf(w, "%s\n", r.String())
-	}
+	s, _ := unboundToHTML(u)
+	fmt.Fprintf(w, "%s\n", s)
 }
 
 func Xml(w http.ResponseWriter, u *unbound.Result) {
