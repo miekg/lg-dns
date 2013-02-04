@@ -4,11 +4,10 @@ Inspired by [the DNS looking glass
 implementation](http://www.bortzmeyer.org/dns-lg-usage.html), we decided to
 create a seperate code base and implement a looking glass in Go.
 
-# Features
+## Features
 
 The XML is based on the [DNS XML internet-draft](http://tools.ietf.org/html/draft-mohan-dns-query-xml-00), all
 other supported formats (zone and json) are converted from this base XML format.
-
 
 Supported formats:
 
@@ -17,3 +16,8 @@ Supported formats:
 * zone (text based output)
 
 The original formats (text and html) are not supported as they don't add anything to the above ones.
+
+## DNS Looking Glasses 
+
+* .....
+* .....
