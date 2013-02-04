@@ -14,6 +14,7 @@ import (
 	"log"
 	"log/syslog"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -134,6 +135,15 @@ func main() {
 		handler(w, r, strings.ToUpper(mux.Vars(r)["type"]))
 	})
 	http.HandleFunc("/favicon.ico", void)
+	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+		h, e := os.Open("README.html")
+		if e != nil {
+			fmt.Fprintf(w, "Documentation not found")
+			return
+		}
+		defer h.Close()
+		Copy(w, h)
+	})
 	http.Handle("/", router)
 
 	lg, err = syslog.NewLogger(syslog.LOG_INFO, log.LstdFlags)
