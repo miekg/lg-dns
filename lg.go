@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
+	"io"
 	"log"
 	"log/syslog"
 	"net/http"
@@ -115,6 +116,16 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 	}
 }
 
+func indexhtml(w http.ResponseWriter, r *http.Request) {
+	h, e := os.Open("README.html")
+	if e != nil {
+		fmt.Fprintf(w, "Documentation not found")
+		return
+	}
+	defer h.Close()
+	io.Copy(w, h)
+}
+
 func main() {
 	port := flag.Int("port", 80, "port number to use")
 	mail = flag.String("mail", "nobody@example.com", "email of service maintainer")
@@ -128,6 +139,9 @@ func main() {
 
 	var err error
 	router := mux.NewRouter()
+	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+		indexhtml(w, r)
+	})
 	router.HandleFunc("/{domain}", func(w http.ResponseWriter, r *http.Request) {
 		handler(w, r, "A")
 	})
@@ -135,15 +149,6 @@ func main() {
 		handler(w, r, strings.ToUpper(mux.Vars(r)["type"]))
 	})
 	http.HandleFunc("/favicon.ico", void)
-	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
-		h, e := os.Open("README.html")
-		if e != nil {
-			fmt.Fprintf(w, "Documentation not found")
-			return
-		}
-		defer h.Close()
-		Copy(w, h)
-	})
 	http.Handle("/", router)
 
 	lg, err = syslog.NewLogger(syslog.LOG_INFO, log.LstdFlags)
