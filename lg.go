@@ -3,7 +3,8 @@ package main
 // DNS Looking glass
 // http://www.bortzmeyer.org/dns-lg.html
 
-// TODO: Fix the output to be more inline with the other ones
+// TODO:
+// * Add ?subnet option?
 
 import (
 	"flag"
