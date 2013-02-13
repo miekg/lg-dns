@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/miekg/dns"
 	"github.com/miekg/unbound"
+	"html"
 	"io"
 	"log"
 	"log/syslog"
@@ -44,6 +45,7 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 		return
 	}
 	domain := mux.Vars(r)["domain"]
+	domain = html.UnescapeString(domain)
 
 	u := unbound.New()
 	defer u.Destroy()

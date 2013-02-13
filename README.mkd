@@ -4,6 +4,11 @@ Inspired by [the DNS looking glass
 implementation](http://www.bortzmeyer.org/dns-lg-usage.html), we decided to
 create a seperate code base and implement a looking glass in Go.
 
+## DNS Looking Glasses
+
+* .....
+* .....
+
 ## Features
 
 The XML is based on the [DNS XML internet-draft](http://tools.ietf.org/html/draft-mohan-dns-query-xml-00), all
@@ -44,11 +49,6 @@ reverse:
 buffersize:
 
 :    `buffersize=xxxx`, <a href="/sidnlabs.nl/MX?buffersize=4096">sidnlabs.nl/MX?buffersize=4096</a>
-
-## DNS Looking Glasses
-
-* .....
-* .....
 
 ## This code
 
