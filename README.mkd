@@ -49,3 +49,8 @@ buffersize:
 
 * .....
 * .....
+
+## This code
+
+This code is open source and licensed under the GPL version 2. The source repository can
+be [found at github.com](http://github.com/miekg/lg-dns).
