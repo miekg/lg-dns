@@ -34,9 +34,10 @@ type Response struct {
 }
 
 type LookingGlass struct {
-	XMLName  xml.Name `xml:"Result" json:"-"`
-	Query    Query    `xml:"Query" json:"Query"`
-	Response Response `xml:"Response" json:"Response"`
+	XMLName    xml.Name `xml:"Result" json:"-"`
+	Query      Query    `xml:"Query" json:"Query"`
+	Response   Response `xml:"Response" json:"Response"`
+	Validation string   `xml:"Validation" json:"Validation"`
 }
 
 type ResourceRecord struct {
@@ -93,6 +94,12 @@ func unboundToZone(u *unbound.Result) (string, error) {
 	for _, r := range u.AnswerPacket.Answer {
 		output += r.String() + "\n"
 	}
+	if u.Secure {
+		output += "\n; Validation: Secure\n"
+	}
+	if u.Bogus {
+		output += "\n; Validation: " + u.WhyBogus + "\n"
+	}
 	return output, nil
 }
 
@@ -105,6 +112,12 @@ func toLookingGlass(u *unbound.Result) *LookingGlass {
 			Rcode:    dns.RcodeToString[u.AnswerPacket.Rcode],
 			Anscount: len(u.AnswerPacket.Answer)}}
 	l.Response.Answers = sectionToResourceRecords(u.AnswerPacket.Answer)
+	if u.Secure {
+		l.Validation = "Secure"
+	}
+	if u.Bogus {
+		l.Validation = u.WhyBogus
+	}
 	return l
 }
 
