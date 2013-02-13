@@ -139,7 +139,10 @@ func main() {
 
 	var err error
 	router := mux.NewRouter()
-	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		indexhtml(w, r)
+	})
+	router.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
 		indexhtml(w, r)
 	})
 	router.HandleFunc("/{domain}", func(w http.ResponseWriter, r *http.Request) {
