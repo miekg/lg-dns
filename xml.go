@@ -86,8 +86,8 @@ func unboundToZone(u *unbound.Result) (string, error) {
 	output += "; Description: " + lg.Query.Description + "\n"
 	output += "; Server: " + lg.Query.Server + "\n"
 	output += "; Flags: Aa: " + boolToString(u.AnswerPacket.Authoritative)
-	output += ",Ad: " + boolToString(u.AnswerPacket.AuthenticatedData)
-	output += ",Cd: " + boolToString(u.AnswerPacket.CheckingDisabled)
+	output += ", Ad: " + boolToString(u.AnswerPacket.AuthenticatedData)
+	output += ", Cd: " + boolToString(u.AnswerPacket.CheckingDisabled)
 	output += ", Rcode: " + dns.RcodeToString[u.AnswerPacket.Rcode] + "\n"
 	output += "\n; Answer Section:\n"
 	for _, r := range u.AnswerPacket.Answer {

@@ -11,13 +11,41 @@ other supported formats (zone and json) are converted from this base XML format.
 
 Supported formats:
 
-* Json
+* Json,
 * XML
 * zone (text based output)
 
 The original formats (text and html) are not supported as they don't add anything to the above ones.
 
-## DNS Looking Glasses 
+Support values:
+
+format:
+
+:    Can be `format=json`, `format=xml` or `format=zone`
+
+tcp:
+
+:    `tcp=1`, <a href="/sidnlabs.nl/MX?tcp=1">sidnlabs.nl/MX?tcp=1</a>
+
+server:
+
+:    `server=ip`,
+
+dodnssec:
+
+:    `dodnssec=1`,
+
+
+reverse:
+
+:    `reverse=1`, <a href="/192.5.5.241?reverse=1">192.5.5.241?reverse=1</a>
+
+
+buffersize:
+
+:    `buffersize=xxxx`, <a href="/sidnlabs.nl/MX?buffersize=4096">sidnlabs.nl/MX?buffersize=4096</a>
+
+## DNS Looking Glasses
 
 * .....
 * .....
