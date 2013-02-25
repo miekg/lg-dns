@@ -6,8 +6,10 @@ create a seperate code base and implement a looking glass in Go.
 
 ## DNS Looking Glasses
 
-* .....
-* .....
+* [SIDN Labs](http://dns-lg.net) 
+* [Stéphane Bortzmeyer](http://dns.bortzmeyer.org/)
+* [Generic NIC](http://dnslg.generic-nic.net/)
+* [NLnetLabs](http://dns-lg.nlnetlabs.nl/)
 
 ## Features
 
@@ -34,11 +36,11 @@ tcp:
 
 server:
 
-:    `server=ip`,
+:    `server=ip`
 
 dodnssec:
 
-:    `dodnssec=1`,
+:    `dodnssec=1`
 
 
 reverse:
