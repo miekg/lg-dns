@@ -62,7 +62,17 @@ func handler(w http.ResponseWriter, r *http.Request, typ string) {
 			if v[0] == "1" {
 				u.SetOption("module-config:", "validator iterator")
 				u.SetOption("edns-buffer-size:", "4096")
-				u.AddTaFile("Kroot.key")
+				u.AddTa(`;; ANSWER SECTION:
+.                       168307 IN DNSKEY 257 3 8 (
+                                AwEAAagAIKlVZrpC6Ia7gEzahOR+9W29euxhJhVVLOyQ
+                                bSEW0O8gcCjFFVQUTf6v58fLjwBd0YI0EzrAcQqBGCzh
+                                /RStIoO8g0NfnfL2MTJRkxoXbfDaUeVPQuYEhg37NZWA
+                                JQ9VnMVDxP/VHL496M/QZxkjf5/Efucp2gaDX6RS6CXp
+                                oY68LsvPVjR0ZSwzz1apAzvN9dlzEheX7ICJBBtuA6G3
+                                LQpzW5hOA2hzCTMjJPJ8LbqF6dsV6DoBQzgul0sGIcGO
+                                Yl7OyQdXfZ57relSQageu+ipAdTTJ25AsRTAoub8ONGc
+                                LmqrAmRLKBP1dfwhYB4N7knNnulqQxA+Uk1ihz0=
+                                ) ; key id = 19036`)
 			}
 		case "buffersize":
 			if err := u.SetOption("edns-buffer-size:", v[0]); err != nil {
